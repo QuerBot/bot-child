@@ -1,0 +1,37 @@
+{
+	"name": "querbot-child",
+	"version": "1.0.0",
+	"description": "analyze follows and followers of covid denier influencers",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "babel-node index.js",
+		"start:dev": "nodemon"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/QuerBot/bot-child.git"
+	},
+	"author": "dstN",
+	"bugs": {
+		"url": "https://github.com/QuerBot/bot-child/issues"
+	},
+	"homepage": "https://github.com/QuerBot/bot-child#readme",
+	"dependencies": {
+		"axios": "^0.26.1",
+		"cron": "^1.8.3",
+		"dotenv": "^16.0.0",
+		"node-cache": "^5.1.2",
+		"twitter-api-v2": "^1.11.3"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.8.7",
+		"@babel/node": "^7.8.7",
+		"@babel/plugin-proposal-decorators": "^7.8.3",
+		"@babel/plugin-transform-runtime": "^7.8.3",
+		"@babel/preset-env": "^7.8.7",
+		"@babel/register": "^7.8.6",
+		"@babel/runtime": "^7.8.7",
+		"nodemon": "^2.0.2"
+	}
+}
