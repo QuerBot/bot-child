@@ -10,7 +10,7 @@ We only get 1000 Followers/Followings per request, so people who have more than 
 
 This won't fit for my purposes of this bot because we have people with huge followerbases and I want to analyze the bubbles behind this.
 
-The sad about this is, that you have to make a new Twitter-Bot-Account everytime you keep hitting your rate limits.
+The sad part about this is, that you have to make a new Twitter-Bot-Account everytime you keep hitting your rate limits.
 
 Just imagine how long it would take to get all followers of Elon Musk for example.
 
