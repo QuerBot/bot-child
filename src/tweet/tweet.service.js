@@ -6,16 +6,12 @@ export async function getNextTweet() {
 	const response = await axios.get(`${process.env.BASE_URL}/tweet`);
 	return response.data;
 }
-// #endregion
-
-// #region - Post Routes
-export async function queueTweet(tweet) {
-	await axios.post(`${process.env.BASE_URL}/tweet`, tweet);
-}
-// #endregion
 
 // #region - Update/Patch Routes
+export async function tweetInProgress(id) {
+	await axios.patch(`${process.env.BASE_URL}/tweet/${id}/inProgress`);
+}
 export async function doneTweet(id) {
-	await axios.patch(`${process.env.BASE_URL}/tweet`, id);
+	await axios.patch(`${process.env.BASE_URL}/tweet/${id}/done`);
 }
 // #endregion
