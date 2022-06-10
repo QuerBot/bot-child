@@ -43,9 +43,10 @@ export async function getBubbleMostFollowedUsers(id, count) {
 
 export async function postBubble(bubble) {
 	let bubbleExist = await getBubbleByName(bubble.name);
-	if (bubbleExist.length) {
+	if (!bubbleExist.length) {
 		await axios.post(`${process.env.BASE_URL}/bubble`, bubble);
-		return 'Bubble was successfully added';
+		console.log('Bubble was successfully added');
+		return;
 	}
 	console.log('Bubble already exists');
 }
