@@ -14,17 +14,14 @@ export async function starter(fileName, bubbleName, bubbleDesc) {
 }
 
 async function listIterator(list, bubbleName) {
-	list.split(/\r?\n/).forEach((id) => {
-		if (!id.length) {
-			return false;
-		}
-		setTimeout(buildUser, 1000, id, bubbleName);
-	});
+	list = list.split(/\r?\n/).slice(0, -1);
+	for (let id of list) {
+		await buildUser(id, bubbleName);
+	}
 }
 
 async function buildUser(id, bubbleName) {
-	console.log('got called');
-	let handle = await twitterService.getUserHandle(id);
+	let handle = await twitterService.scrapeHandle(id);
 	let bubbleId = await bubbleService.getBubbleByName(bubbleName);
 	bubbleId = bubbleId[0].id;
 	let user = {
@@ -33,5 +30,9 @@ async function buildUser(id, bubbleName) {
 		rating: 0,
 		bubble: [{ id: bubbleId }],
 	};
-	await userService.postUser(user);
+	if (handle === false) {
+		return false;
+	} else {
+		await userService.postUser(user);
+	}
 }
