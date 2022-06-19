@@ -19,19 +19,30 @@ export async function getUserHandle(id) {
 	return user.username;
 }
 
-export async function scrapeHandle(id) {
+export async function scrapeHandle(list) {
 	const prefix = 'https://twitter.com/i/';
 	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
-	await page.goto(`https://twitter.com/i/user/${id}`, {
-		waitUntil: 'networkidle2',
-	});
-	let url = page.url();
-	await browser.close();
-	if (url.startsWith(prefix)) {
-		return false;
-	} else {
-		url = url.split('https://twitter.com/').pop();
-		return url;
+	let userArray = [];
+	for (let id of list) {
+		let userObj = {};
+		await page.goto(`https://twitter.com/i/user/${id}`, {
+			waitUntil: 'networkidle2',
+		});
+		let url = page.url();
+		if (url.startsWith(prefix)) {
+			continue;
+		} else {
+			url = url.split('https://twitter.com/').pop();
+			if (url === '404') {
+				continue;
+			}
+			userObj.id = id;
+			userObj.handle = url;
+			userArray.push(userObj);
+			console.log(`${userObj.handle} wurde ins Array gepusht`);
+		}
 	}
+	await browser.close();
+	return userArray;
 }

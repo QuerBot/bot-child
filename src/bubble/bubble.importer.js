@@ -10,29 +10,32 @@ export async function starter(fileName, bubbleName, bubbleDesc) {
 		description: bubbleDesc,
 	};
 	await bubbleService.postBubble(bubble);
-	await listIterator(file, bubbleName);
+	await makeArrayFromList(file, bubbleName);
 }
 
-async function listIterator(list, bubbleName) {
+async function makeArrayFromList(list, bubbleName) {
 	list = list.split(/\r?\n/).slice(0, -1);
-	for (let id of list) {
-		await buildUser(id, bubbleName);
-	}
+	await buildUser(list, bubbleName);
 }
 
-async function buildUser(id, bubbleName) {
-	let handle = await twitterService.scrapeHandle(id);
+async function buildUser(list, bubbleName) {
+	let users = await twitterService.scrapeHandle(list);
 	let bubbleId = await bubbleService.getBubbleByName(bubbleName);
 	bubbleId = bubbleId[0].id;
-	let user = {
-		id: id,
-		handle: handle,
-		rating: 0,
-		bubble: [{ id: bubbleId }],
-	};
-	if (handle === false) {
-		return false;
-	} else {
-		await userService.postUser(user);
+	let userArray = [];
+	for (let user of users) {
+		let pushUser = {
+			id: user.id,
+			handle: user.handle,
+			rating: 0,
+			bubble: [{ id: bubbleId }],
+		};
+		let checkUser = await userService.getUserById(user.id);
+		if (checkUser.length) {
+			await userService.addUserToBubble(user.id, bubbleId);
+			continue;
+		}
+		userArray.push(pushUser);
 	}
+	await userService.postUser(userArray);
 }
