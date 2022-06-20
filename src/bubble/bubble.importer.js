@@ -32,10 +32,23 @@ async function buildUser(list, bubbleName) {
 		};
 		let checkUser = await userService.getUserById(user.id);
 		if (checkUser.length) {
-			await userService.addUserToBubble(user.id, bubbleId);
+			let userBubbles = checkUser[0].bubble;
+			if (userBubbles.length) {
+				for (let bubble of userBubbles) {
+					if (!bubble.id === bubbleId) {
+						await userService.addUserToBubble(pushUser.id, bubbleId);
+						continue;
+					}
+				}
+			} else {
+				await userService.addUserToBubble(pushUser.id, bubbleId);
+				continue;
+			}
 			continue;
 		}
 		userArray.push(pushUser);
 	}
-	await userService.postUser(userArray);
+	if (userArray.length) {
+		await userService.postUser(userArray);
+	}
 }
