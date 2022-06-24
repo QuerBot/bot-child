@@ -1,5 +1,7 @@
 import client from '../clients/client';
 const puppeteer = require('puppeteer');
+const NodeCache = require('node-cache');
+export const botCache = new NodeCache({ checkperiod: 900 });
 
 export async function getUserID(userHandle) {
 	let user = await client.v2.userByUsername(userHandle);
@@ -17,6 +19,39 @@ export async function getUserHandle(id) {
 		return false;
 	}
 	return user.username;
+}
+
+export async function getFollowings(id, token) {
+	let options = {};
+	if (token === undefined) {
+		token = {};
+	}
+	if (token.next_token) {
+		options = {
+			asPaginator: true,
+			max_results: 1000,
+			pagination_token: token.next_token,
+		};
+	} else {
+		options = {
+			asPaginator: true,
+			max_results: 1000,
+		};
+	}
+
+	const followings = await client.v2.following(id, options);
+
+	let rateLimit = followings._rateLimit;
+	let nextToken = followings._realData.meta;
+	botCache.set('rate', rateLimit);
+	botCache.set('token', nextToken);
+
+	let followingList = [];
+	for (const follows of followings._realData.data) {
+		followingList.push(follows);
+	}
+
+	return followingList;
 }
 
 export async function scrapeHandle(list) {

@@ -9,7 +9,8 @@ export async function getNextTweet() {
 
 // #region - Update/Patch Routes
 export async function tweetInProgress(id) {
-	await axios.patch(`${process.env.BASE_URL}/tweet/${id}/inProgress`);
+	console.log('Tweet set on "in Progress"');
+	//await axios.patch(`${process.env.BASE_URL}/tweet/${id}/inProgress`);
 }
 export async function doneTweet(id) {
 	await axios.patch(`${process.env.BASE_URL}/tweet/${id}/done`);

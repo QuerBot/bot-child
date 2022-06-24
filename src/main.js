@@ -3,18 +3,17 @@ import 'dotenv/config';
 import fs from 'fs';
 import * as tweetService from './tweet/tweet.service';
 import * as bubbleImporter from './bubble/bubble.importer';
-import * as controller from './controller';
-import * as twitterService from './twitter-api/api.service';
 const CronJob = require('cron').CronJob;
 
-bubbleImporter.starter('testlist.txt', process.env.BUBBLE_NAME, process.env.BUBBLE_DESC);
+//bubbleImporter.starter('testlist.txt', process.env.BUBBLE_NAME, process.env.BUBBLE_DESC);
 
 async function test() {
-	//let next = await tweetService.getNextTweet();
-	twitterService.scrapeHandle('1199760287123070984');
+	let currentTweet = await tweetService.getNextTweet();
+	await tweetService.tweetInProgress(currentTweet.tweetID);
+	console.log(currentTweet.requestedUser.id);
 }
 
-//test();
+test();
 
 const job = new CronJob(
 	'*/10 * * * * *',
