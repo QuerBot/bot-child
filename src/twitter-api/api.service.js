@@ -24,13 +24,13 @@ export async function getUserHandle(id) {
 export async function getFollowings(id, token) {
 	let options = {};
 	if (token === undefined) {
-		token = {};
+		token = false;
 	}
-	if (token.next_token) {
+	if (token) {
 		options = {
 			asPaginator: true,
 			max_results: 1000,
-			pagination_token: token.next_token,
+			pagination_token: token,
 		};
 	} else {
 		options = {
@@ -39,7 +39,7 @@ export async function getFollowings(id, token) {
 		};
 	}
 
-	const followings = await client.v2.following(id, options);
+	const followings = await client.v2.following(id, options, { requestEventDebugHandler: (eventType, data) => console.log('Event', eventType, 'with data', data) });
 
 	let rateLimit = followings._rateLimit;
 	let nextToken = followings._realData.meta;
