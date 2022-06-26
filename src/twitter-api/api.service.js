@@ -1,4 +1,4 @@
-import client from '../clients/client';
+import client from '../clients/clientParent';
 const puppeteer = require('puppeteer');
 const NodeCache = require('node-cache');
 export const botCache = new NodeCache({ checkperiod: 900 });
@@ -21,37 +21,55 @@ export async function getUserHandle(id) {
 	return user.username;
 }
 
-export async function getFollowings(id, token) {
-	let options = {};
-	if (token === undefined) {
-		token = false;
-	}
-	if (token) {
-		options = {
-			asPaginator: true,
-			max_results: 1000,
-			pagination_token: token,
-		};
-	} else {
-		options = {
-			asPaginator: true,
-			max_results: 1000,
-		};
+export async function getFollowings(id = false, token = false, list = []) {
+	if (!id) {
+		return false; // If theres no ID stop the script immediately
 	}
 
-	const followings = await client.v2.following(id, options, { requestEventDebugHandler: (eventType, data) => console.log('Event', eventType, 'with data', data) });
-
-	let rateLimit = followings._rateLimit;
-	let nextToken = followings._realData.meta;
-	botCache.set('rate', rateLimit);
-	botCache.set('token', nextToken);
-
-	let followingList = [];
-	for (const follows of followings._realData.data) {
-		followingList.push(follows);
+	let checkUser = await getUserHandle(id);
+	if (!checkUser) {
+		return false; // If user doesn't exist, stop the script immediately
 	}
 
-	return followingList;
+	let options = {
+		asPaginator: true,
+		max_results: 1000,
+	};
+	if (token && token === 'end') {
+		return list;
+	} else if (token) {
+		options.pagination_token = token;
+	}
+
+	let currentList = list;
+	let followings;
+	let rateLimit;
+	let nextToken = {};
+
+	try {
+		followings = await client.v2.following(id, options);
+		rateLimit = followings._rateLimit;
+		nextToken = followings._realData.meta;
+		for (const follows of followings._realData.data) {
+			currentList.push(follows);
+		}
+	} catch (e) {
+		if (e.data.status === 429) {
+			rateLimit = e.rateLimit;
+			let currentDate = Date.now();
+			currentDate = Math.floor(currentDate / 1000);
+			let difference = rateLimit.reset - currentDate;
+			difference = (difference + 5) * 1000;
+			await new Promise((resolve) => setTimeout(resolve, difference));
+			nextToken.next_token = token;
+		}
+	}
+
+	if ('next_token' in nextToken) {
+		return await getFollowings(id, nextToken.next_token, currentList);
+	}
+
+	return currentList;
 }
 
 export async function scrapeHandle(list) {
