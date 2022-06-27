@@ -8,6 +8,7 @@ export async function handler(id) {
 	let userAdded = await listCompare(followings, bubbleMembers);
 	let userExist = await userService.getUserById(id);
 	if (userAdded && !userExist.length) {
+		console.log('New User');
 		let userObject = {
 			id: id,
 			handle: await apiService.getUserHandle(id),
@@ -16,14 +17,21 @@ export async function handler(id) {
 		};
 		await userService.postUser(userObject);
 	} else if (userAdded && userExist.length) {
+		console.log('Existing User');
 		let updateObject = {
-			rating: userExist.rating + 1,
+			rating: userExist[0].rating + 1,
 		};
 		await userService.updateUser(id, updateObject);
+	} else if (!userAdded) {
+		console.log(userAdded);
+		return false;
 	}
 }
 
-async function listCompare(followings, bubbleMembers) {
+async function listCompare(followings = false, bubbleMembers = false) {
+	if (followings === false || bubbleMembers === false) {
+		return false;
+	}
 	let positives = 0;
 	let followLength = followings.length;
 	let percentage = 0;

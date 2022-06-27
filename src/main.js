@@ -8,8 +8,8 @@ const CronJob = require('cron').CronJob;
 
 //bubbleImporter.starter('testlist.txt', process.env.BUBBLE_NAME, process.env.BUBBLE_DESC);
 
-//userHandler.handler(process.env.EXAMPLE_USRID);
-userHandler.handler(process.env.EXMPL);
+userHandler.handler(process.env.EXAMPLE_USRID);
+//userHandler.handler(process.env.EXMPL);
 //userHandler('1337');
 
 const job = new CronJob(

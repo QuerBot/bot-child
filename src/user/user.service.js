@@ -53,8 +53,6 @@ export async function addUserToBubble(userid, bubbleid) {
 
 export async function updateUser(userid, user) {
 	let userExist = await getUserById(userid);
-	let currentDate = new Date().toISOString();
-	user.lastCheck = currentDate;
 	if (userExist.length) {
 		try {
 			await axios.patch(`${process.env.BASE_URL}/user/${userid}`, user);
