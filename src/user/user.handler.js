@@ -1,31 +1,57 @@
 import * as userService from '../user/user.service';
 import * as bubbleService from '../bubble/bubble.service';
 import * as apiService from '../twitter-api/api.service';
+import * as tweetService from '../tweet/tweet.service';
 
-export async function handler(id) {
+export async function handler(id, tweet) {
 	let followings = await apiService.getFollowings(id);
+	let bubble = await bubbleService.getBubbleById(process.env.BUBBLEID);
+	bubble = bubble[0];
 	let bubbleMembers = await bubbleService.getBubbleMembers(process.env.BUBBLEID);
 	let userAdded = await listCompare(followings, bubbleMembers);
 	let userExist = await userService.getUserById(id);
-	if (userAdded && !userExist.length) {
+	if (userAdded.promise && userExist[0].rating === 0) {
 		console.log('New User');
 		let userObject = {
 			id: id,
 			handle: await apiService.getUserHandle(id),
 			bubble: [{ id: process.env.BUBBLEID }],
-			rating: 0,
+			rating: 1,
 		};
 		await userService.postUser(userObject);
-	} else if (userAdded && userExist.length) {
+		await updateFollowings(id, followings);
+		await tweetService.sendTweet(1, bubble, userExist[0], tweet, userAdded.percentage);
+		return;
+	} else if (userAdded.promise && userExist[0].rating > 0) {
 		console.log('Existing User');
 		let updateObject = {
 			rating: userExist[0].rating + 1,
 		};
 		await userService.updateUser(id, updateObject);
-	} else if (!userAdded) {
-		console.log(userAdded);
-		return false;
+		await updateFollowings(id, followings);
+		await tweetService.sendTweet(2, bubble, userExist[0], tweet, userAdded.percentage);
+		return true;
+	} else if (!userAdded.promise) {
+		await tweetService.sendTweet(3, bubble, userExist[0], tweet, userAdded.percentage);
+		return true;
 	}
+	return false;
+}
+
+async function updateFollowings(id, followings) {
+	let userArray = [];
+	for (const user of followings) {
+		let userObject = {};
+		userObject.id = user.id;
+		let userExist = await userService.getUserById(user.id);
+		userArray.push(userObject);
+		if (userExist.length) {
+			continue;
+		}
+		userObject.handle = user.username;
+		await userService.postUser(userObject);
+	}
+	await userService.updateFollowings(id, userArray);
 }
 
 async function listCompare(followings = false, bubbleMembers = false) {
@@ -49,6 +75,7 @@ async function listCompare(followings = false, bubbleMembers = false) {
 
 	percentage = positives / (followLength / 100);
 
+	let returnObject = {};
 	let requiredPercentage = -1;
 
 	if (followLength <= 10) {
@@ -59,13 +86,18 @@ async function listCompare(followings = false, bubbleMembers = false) {
 		requiredPercentage = 15;
 	} else {
 		if (positives >= 15 || percentage >= 10) {
-			return true;
+			returnObject.promise = true;
+			returnObject.percentage = percentage;
+			return returnObject;
 		} else {
 			requiredPercentage = 10;
 		}
 	}
 
-	return await checkTreshhold(requiredPercentage, percentage);
+	returnObject.promise = await checkTreshhold(requiredPercentage, percentage);
+	returnObject.percentage = percentage;
+
+	return returnObject;
 }
 
 async function checkTreshhold(requiredPercentage, percentage) {

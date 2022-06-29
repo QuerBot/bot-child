@@ -1,4 +1,4 @@
-import client from '../clients/clientParent';
+import client from '../clients/client';
 const puppeteer = require('puppeteer');
 const NodeCache = require('node-cache');
 export const botCache = new NodeCache({ checkperiod: 900 });
