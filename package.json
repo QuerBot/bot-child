@@ -21,6 +21,7 @@
 		"axios": "^0.26.1",
 		"cron": "^1.8.3",
 		"dotenv": "^16.0.0",
+		"log-timestamp": "^0.3.0",
 		"node-cache": "^5.1.2",
 		"puppeteer": "^14.4.0",
 		"twitter-api-v2": "^1.11.3"

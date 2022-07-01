@@ -21,7 +21,7 @@ export async function handler(id, tweet) {
 		await userService.postUser(userObject);
 		await updateFollowings(id, followings);
 		await tweetService.sendTweet(1, bubble, userExist[0], tweet, userAdded.percentage);
-		return;
+		return true;
 	} else if (userAdded.promise && userExist[0].rating > 0) {
 		console.log('Existing User');
 		let updateObject = {
@@ -39,19 +39,15 @@ export async function handler(id, tweet) {
 }
 
 async function updateFollowings(id, followings) {
-	let userArray = [];
+	let followArray = [];
 	for (const user of followings) {
 		let userObject = {};
 		userObject.id = user.id;
-		let userExist = await userService.getUserById(user.id);
-		userArray.push(userObject);
-		if (userExist.length) {
-			continue;
-		}
 		userObject.handle = user.username;
-		await userService.postUser(userObject);
+		followArray.push(userObject);
 	}
-	await userService.updateFollowings(id, userArray);
+	await userService.postUser(followArray);
+	await userService.updateFollowings(id, followArray);
 }
 
 async function listCompare(followings = false, bubbleMembers = false) {

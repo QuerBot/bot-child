@@ -25,22 +25,13 @@ export async function sendTweet(code = 0, bubble = false, user = false, tweet = 
 	if(code === 0) {
 	} else if(code === 1) {
 		// User is part of bubble and got added
-		await client.v2.reply(
-			`${user.handle} folgt ${percentage}% der Bubble: ${bubble.name}. Der User wurde daher der Bubble hinzugefügt. Vielen Dank!`,
-			tweet,
-		);
+		await client.v2.reply(`In den Followings von ${user.handle} sind ${percentage}% Mitglied der Bubble: ${bubble.name}. Der User wurde daher der Bubble hinzugefügt. Vielen Dank!`, tweet);
 	} else if(code === 2) {
 		// User is part of bubble but was already part of bubble
-		await client.v2.reply(
-			`${user.handle} folgt ${percentage}% der Bubble: ${bubble.name}. Der User war aber schon Teil der Bubble. Seine Followings wurden aktualisiert. Vielen Dank!`,
-			tweet,
-		);
+		await client.v2.reply(`In den Followings von ${user.handle} sind ${percentage}% Mitglied der Bubble: ${bubble.name}. Der User war aber schon Teil der Bubble. Seine Followings wurden aktualisiert. Vielen Dank!`, tweet);
 	} else if(code === 3) {
 		// User is NOT part of bubble and was NOT added
-		await client.v2.reply(
-			`${user.handle} folgt ${percentage}% Teil der Bubble: ${bubble.name}. Der User folgt zu wenigen Accounts und wurde daher nicht zur Bubble hinzugefügt. Vielen Dank!`,
-			tweet,
-		);
+		await client.v2.reply(`In den Followings von ${user.handle} sind nur ${percentage}% Mitglied der Bubble: ${bubble.name}. Der User folgt zu wenigen Accounts und wurde daher nicht zur Bubble hinzugefügt. Vielen Dank!`, tweet);
 	}
 	return true;
 }
