@@ -9,6 +9,7 @@ export async function handler(id, tweet) {
 	bubble = bubble[0];
 	let bubbleMembers = await bubbleService.getBubbleMembers(process.env.BUBBLEID);
 	let userAdded = await listCompare(followings, bubbleMembers);
+	console.log(userAdded);
 	let userExist = await userService.getUserById(id);
 	if (userAdded.promise && userExist[0].rating === 0) {
 		console.log('New User');
@@ -98,7 +99,7 @@ async function listCompare(followings = false, bubbleMembers = false) {
 		if (positives >= 15 || percentage >= 10) {
 			returnObject.promise = true;
 			returnObject.percentage = percentage;
-			returnObject.followCount = followLength;
+			returnObject.followCount = positives;
 			return returnObject;
 		} else {
 			requiredPercentage = 10;
