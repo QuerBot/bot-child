@@ -4,6 +4,9 @@ import * as tweetService from './tweet/tweet.service';
 import * as userHandler from './user/user.handler';
 const CronJob = require('cron').CronJob;
 
+import * as userService from './user/user.service';
+import * as apiService from './twitter-api/api.service';
+
 async function test() {
 	console.log('Got Called');
 	let nextTweet = await tweetService.getNextTweet();
@@ -30,3 +33,4 @@ const job = new CronJob(
 );
 
 job.start();
+

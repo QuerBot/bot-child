@@ -20,7 +20,7 @@ export async function handler(id, tweet) {
 		};
 		await userService.postUser(userObject);
 		await updateFollowings(id, followings);
-		await tweetService.sendTweet(1, bubble, userExist[0], tweet, userAdded.percentage);
+		await tweetService.sendTweet(1, bubble, userExist[0], tweet, userAdded.percentage, userAdded.followCount);
 		return true;
 	} else if (userAdded.promise && userExist[0].rating > 0) {
 		console.log('Existing User');
@@ -29,10 +29,24 @@ export async function handler(id, tweet) {
 		};
 		await userService.updateUser(id, updateObject);
 		await updateFollowings(id, followings);
-		await tweetService.sendTweet(2, bubble, userExist[0], tweet, userAdded.percentage);
+		await tweetService.sendTweet(2, bubble, userExist[0], tweet, userAdded.percentage, userAdded.followCount);
 		return true;
 	} else if (!userAdded.promise) {
-		await tweetService.sendTweet(3, bubble, userExist[0], tweet, userAdded.percentage);
+		let userBubbles = userExist[0].bubble;
+		let isBubbleMember;
+		for (bubble of userBubbles) {
+			if (bubble.id === process.env.BUBBLEID) {
+				isBubbleMember = true;
+			} else {
+				continue;
+			}
+		}
+		if (!isBubbleMember) {
+			await tweetService.sendTweet(3, bubble, userExist[0], tweet, userAdded.percentage, userAdded.followCount);
+		} else {
+			await tweetService.sendTweet(4, bubble, userExist[0], tweet, userAdded.percentage, userAdded.followCount);
+		}
+
 		return true;
 	}
 	return false;
@@ -84,6 +98,7 @@ async function listCompare(followings = false, bubbleMembers = false) {
 		if (positives >= 15 || percentage >= 10) {
 			returnObject.promise = true;
 			returnObject.percentage = percentage;
+			returnObject.followCount = followLength;
 			return returnObject;
 		} else {
 			requiredPercentage = 10;
@@ -92,6 +107,7 @@ async function listCompare(followings = false, bubbleMembers = false) {
 
 	returnObject.promise = await checkTreshhold(requiredPercentage, percentage);
 	returnObject.percentage = percentage;
+	returnObject.followCount = followLength;
 
 	return returnObject;
 }

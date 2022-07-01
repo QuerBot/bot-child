@@ -50,11 +50,15 @@ export async function getFollowings(id = false, token = false, list = []) {
 		followings = await client.v2.following(id, options);
 		rateLimit = followings._rateLimit;
 		nextToken = followings._realData.meta;
-		for (const follows of followings._realData.data) {
-			currentList.push(follows);
+		if (nextToken.result_coint > 0) {
+			for (const follows of followings._realData.data) {
+				currentList.push(follows);
+			}
+		} else {
+			return false;
 		}
 	} catch (e) {
-		if (e.data.status === 429) {
+		if (e.data !== undefined && e.data.status !== undefined && e.data.status === 429) {
 			rateLimit = e.rateLimit;
 			let currentDate = Date.now();
 			currentDate = Math.floor(currentDate / 1000);
@@ -62,6 +66,8 @@ export async function getFollowings(id = false, token = false, list = []) {
 			difference = (difference + 5) * 1000;
 			await new Promise((resolve) => setTimeout(resolve, difference));
 			nextToken.next_token = token;
+		} else {
+			console.log(e);
 		}
 	}
 
