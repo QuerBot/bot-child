@@ -50,7 +50,7 @@ export async function getFollowings(id = false, token = false, list = []) {
 		followings = await client.v2.following(id, options);
 		rateLimit = followings._rateLimit;
 		nextToken = followings._realData.meta;
-		if (nextToken.result_coint > 0) {
+		if (nextToken.result_count > 0) {
 			for (const follows of followings._realData.data) {
 				currentList.push(follows);
 			}
