@@ -108,7 +108,7 @@ async function listCompare(followings = false, bubbleMembers = false) {
 
 	returnObject.promise = await checkTreshhold(requiredPercentage, percentage);
 	returnObject.percentage = percentage;
-	returnObject.followCount = followLength;
+	returnObject.followCount = positives;
 
 	return returnObject;
 }
