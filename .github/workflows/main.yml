@@ -18,4 +18,4 @@ jobs:
         username: ${{ secrets.FTP_USR }}
         password: ${{ secrets.FTP_PW }}
         local-dir: ./
-        server-dir: ./parent/
+        server-dir: ./child/
