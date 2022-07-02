@@ -1,7 +1,8 @@
 import client from '../clients/client';
-const puppeteer = require('puppeteer');
+import * as tweetService from '../tweet/tweet.service';
+/* const puppeteer = require('puppeteer');
 const NodeCache = require('node-cache');
-export const botCache = new NodeCache({ checkperiod: 900 });
+export const botCache = new NodeCache({ checkperiod: 900 });*/
 
 export async function getUserID(userHandle) {
 	let user = await client.v2.userByUsername(userHandle);
@@ -21,7 +22,7 @@ export async function getUserHandle(id) {
 	return user.username;
 }
 
-export async function getFollowings(id = false, token = false, list = []) {
+export async function getFollowings(id = false, token = false, list = [], tweetId) {
 	if (!id) {
 		return false; // If theres no ID stop the script immediately
 	}
@@ -48,14 +49,18 @@ export async function getFollowings(id = false, token = false, list = []) {
 
 	try {
 		followings = await client.v2.following(id, options);
-		rateLimit = followings._rateLimit;
-		nextToken = followings._realData.meta;
-		if (nextToken.result_count > 0) {
-			for (const follows of followings._realData.data) {
-				currentList.push(follows);
-			}
-		} else {
+		if ('errors' in followings._realData) {
 			return false;
+		} else {
+			rateLimit = followings._rateLimit;
+			nextToken = followings._realData.meta;
+			if (nextToken.result_count !== undefined && nextToken.result_count > 0) {
+				for (const follows of followings._realData.data) {
+					currentList.push(follows);
+				}
+			} else {
+				return false;
+			}
 		}
 	} catch (e) {
 		if (e.data !== undefined && e.data.status !== undefined && e.data.status === 429) {
@@ -64,6 +69,7 @@ export async function getFollowings(id = false, token = false, list = []) {
 			currentDate = Math.floor(currentDate / 1000);
 			let difference = rateLimit.reset - currentDate;
 			difference = (difference + 5) * 1000;
+			tweetService.tweetInProgress(tweetId);
 			await new Promise((resolve) => setTimeout(resolve, difference));
 			nextToken.next_token = token;
 		} else {

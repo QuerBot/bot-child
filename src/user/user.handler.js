@@ -4,13 +4,16 @@ import * as apiService from '../twitter-api/api.service';
 import * as tweetService from '../tweet/tweet.service';
 
 export async function handler(id, tweet) {
-	let followings = await apiService.getFollowings(id);
+	let followings = await apiService.getFollowings(id, false, [], tweet);
 	let bubble = await bubbleService.getBubbleById(process.env.BUBBLEID);
 	bubble = bubble[0];
 	let bubbleMembers = await bubbleService.getBubbleMembers(process.env.BUBBLEID);
 	let userAdded = await listCompare(followings, bubbleMembers);
 	console.log(userAdded);
 	let userExist = await userService.getUserById(id);
+	if (followings === false) {
+		await tweetService.sendTweet(5, bubble, userExist[0], tweet);
+	}
 	if (userAdded.promise && userExist[0].rating === 0) {
 		console.log('New User');
 		let userObject = {

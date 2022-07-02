@@ -11,8 +11,8 @@ async function test() {
 		console.log('Went out');
 		return;
 	}
-	await tweetService.tweetInProgress(nextTweet.tweetID);
-	console.log('Set Tweet in Progress');
+	//await tweetService.tweetInProgress(nextTweet.tweetID);
+	//console.log('Set Tweet in Progress');
 	let check = await userHandler.handler(nextTweet.requestedUser.id, nextTweet.tweetID);
 	if (check) {
 		await tweetService.doneTweet(nextTweet.tweetID);
