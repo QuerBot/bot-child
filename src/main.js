@@ -2,6 +2,9 @@
 import 'dotenv/config';
 import * as tweetService from './tweet/tweet.service';
 import * as userHandler from './user/user.handler';
+
+import * as apiService from './twitter-api/api.service';
+import * as bubbleService from './bubble/bubble.service';
 const CronJob = require('cron').CronJob;
 
 async function test() {
@@ -20,8 +23,10 @@ async function test() {
 	}
 }
 
+//test();
+
 const job = new CronJob(
-	'*/10 * * * * *',
+	'*/60 * * * * *',
 	async function () {
 		await test();
 	},
@@ -29,5 +34,14 @@ const job = new CronJob(
 	false
 );
 
-job.start();
+//job.start();
+
+async function tester() {
+	let example = await apiService.getUserID('OgrimFarthammer');
+	let follows = await apiService.getFollowings(example);
+	let bubble = await bubbleService.getBubbleMembers(process.env.BUBBLEID);
+	await userHandler.listCompare(follows, bubble);
+}
+
+tester();
 

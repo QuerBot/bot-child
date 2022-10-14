@@ -1,4 +1,4 @@
-import client from '../clients/client';
+import client from '../clients/clientParent';
 import * as tweetService from '../tweet/tweet.service';
 /* const puppeteer = require('puppeteer');
 const NodeCache = require('node-cache');
@@ -53,6 +53,7 @@ export async function getFollowings(id = false, token = false, list = [], tweetI
 			return false;
 		} else {
 			rateLimit = followings._rateLimit;
+			console.log(rateLimit);
 			nextToken = followings._realData.meta;
 			if (nextToken.result_count !== undefined && nextToken.result_count > 0) {
 				for (const follows of followings._realData.data) {

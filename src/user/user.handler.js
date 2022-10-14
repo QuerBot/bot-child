@@ -11,10 +11,11 @@ export async function handler(id, tweet) {
 	let userAdded = await listCompare(followings, bubbleMembers);
 	console.log(userAdded);
 	let userExist = await userService.getUserById(id);
+	console.log(tweet);
 	if (followings === false) {
 		await tweetService.sendTweet(5, bubble, userExist[0], tweet);
-	}
-	if (userAdded.promise && userExist[0].rating === 0) {
+		return true;
+	} else if (userAdded.promise && userExist[0].rating === 0) {
 		console.log('New User');
 		let userObject = {
 			id: id,
@@ -68,7 +69,7 @@ async function updateFollowings(id, followings) {
 	await userService.updateFollowings(id, followArray);
 }
 
-async function listCompare(followings = false, bubbleMembers = false) {
+export async function listCompare(followings = false, bubbleMembers = false) {
 	if (followings === false || bubbleMembers === false) {
 		return false;
 	}
@@ -83,7 +84,7 @@ async function listCompare(followings = false, bubbleMembers = false) {
 		if (!userDoesFollow) {
 			continue;
 		}
-
+		console.log(follow);
 		positives++;
 	}
 
@@ -103,6 +104,7 @@ async function listCompare(followings = false, bubbleMembers = false) {
 			returnObject.promise = true;
 			returnObject.percentage = percentage;
 			returnObject.followCount = positives;
+			console.log(returnObject);
 			return returnObject;
 		} else {
 			requiredPercentage = 10;
@@ -112,7 +114,7 @@ async function listCompare(followings = false, bubbleMembers = false) {
 	returnObject.promise = await checkTreshhold(requiredPercentage, percentage);
 	returnObject.percentage = percentage;
 	returnObject.followCount = positives;
-
+	console.log(returnObject);
 	return returnObject;
 }
 
